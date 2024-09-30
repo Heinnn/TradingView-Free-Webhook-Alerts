@@ -1,4 +1,5 @@
 from src import try_import
+import socket
 
 try_import("pyfiglet")
 try_import("rich")
@@ -286,7 +287,9 @@ class NgrokSignalRedirect:
 
         log.info(f"Sending webhook alert<{email_subject}>, content: {email_content}")
         try:
-            send_webhook(email_content)
+            # send_webhook(email_content)
+            self.send_message(email_content)
+            
             log.info(f"The whole process taken {self.calculate_seconds_to_now(receive_datetime)}s.")
         except Exception as err:
             log.error(f"Sent webhook failed, reason: {err}")
@@ -302,7 +305,21 @@ class NgrokSignalRedirect:
     def setup_api_server(self):
         thread = StoppableThread(target=api_server_start, args=(self._EventID.API_PORT,))
         thread.start()
-        
+
+    def send_message(self, message, host='host.docker.internal', port=65432):
+        try:
+            # Create a socket connection
+            with socket.create_connection((host, port)) as sock:
+                print(f'Sending message: {message}')
+                sock.sendall(message.encode())  # Send the message
+
+                # Receive the response
+                data = sock.recv(1024)  # Receive up to 1024 bytes
+                print(f"Received response: {data.decode()}")
+
+        except Exception as e:
+            print(f"Failed to send message: {e}")
+            
     def main(self):
         if not ngrok_auth_token:
             log.error("Missing ngrok auth token, please set it in the config file.")
