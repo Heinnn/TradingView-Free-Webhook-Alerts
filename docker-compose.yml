@@ -1,13 +1,37 @@
-version: '3'
+version: '3.1'
 services:
-  TradingView-Free-Webhook-Alerts:
+  # Server service
+  OMserver:
     build:
       context: .
-      dockerfile: ./Dockerfile
-    image: tradingview-free-webhook-alerts
-    container_name: tradingview-free-webhook-alerts
-    command: ["python3", "main.py"]
+      dockerfile: ./Dockerfile.OMserver  # Dockerfile for the server
+    image: omserver-image
+    container_name: OMserver
+    ports:
+      - "65432:65432"  # Expose server port
+    networks:
+      - trading_network
+    command: ["python3", "server.py"]  # Command to run the server script
     stdin_open: true
     tty: true
+
+  # Client service
+  TVwebhook:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.TVwebhook  # Dockerfile for the client
+    image: tvwebhook-image
+    container_name: TVwebhook
+    command: ["python3", "TVwebhook.py"]
+    stdin_open: true
+    tty: true
+    networks:
+      - trading_network
+    depends_on:
+      - OMserver  # Ensure client starts after server is up
     volumes:
       - .:/app
+
+networks:
+  trading_network:
+    driver: bridge

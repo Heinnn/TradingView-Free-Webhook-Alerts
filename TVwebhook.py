@@ -306,15 +306,18 @@ class NgrokSignalRedirect:
         thread = StoppableThread(target=api_server_start, args=(self._EventID.API_PORT,))
         thread.start()
 
-    def send_message(self, message, host='host.docker.internal', port=65432):
+    def send_message(self, message, server_address='server', server_port=65432):
         try:
             # Create a socket connection
-            with socket.create_connection((host, port)) as sock:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+                print(f"Connecting to {server_address} on port {server_port}")
+                client_socket.connect((server_address, server_port))  # Connect to the server
+
                 print(f'Sending message: {message}')
-                sock.sendall(message.encode())  # Send the message
+                client_socket.sendall(message.encode())  # Send the message
 
                 # Receive the response
-                data = sock.recv(1024)  # Receive up to 1024 bytes
+                data = client_socket.recv(1024)  # Receive up to 1024 bytes
                 print(f"Received response: {data.decode()}")
 
         except Exception as e:
