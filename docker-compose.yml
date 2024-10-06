@@ -14,6 +14,15 @@ services:
     command: ["python3", "server.py"]  # Command to run the server script
     stdin_open: true
     tty: true
+    volumes:
+      - .:/app  # Added for consistency if needed
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "65432"]
+      interval: 1800s
+      timeout: 10s
+      retries: 3
+      start_period: 30s 
+
 
   # Client service
   TVwebhook:
@@ -28,9 +37,10 @@ services:
     networks:
       - trading_network
     depends_on:
-      - OMserver  # Ensure client starts after server is up
+      OMserver:
+        condition: service_healthy  # Wait for OMserver health check
     volumes:
-      - .:/app
+      - .:/app  # This is already present
 
 networks:
   trading_network:

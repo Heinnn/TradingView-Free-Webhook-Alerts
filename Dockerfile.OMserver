@@ -1,6 +1,12 @@
 # Use an official Python runtime as a parent image
 FROM python:3.10.13-slim-bookworm
 
+# Install netcat (nc) for healthcheck
+RUN apt-get update && apt-get install -y \
+    netcat-traditional  \
+    telnet \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set the working directory inside the container
 WORKDIR /app
 

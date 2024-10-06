@@ -306,7 +306,7 @@ class NgrokSignalRedirect:
         thread = StoppableThread(target=api_server_start, args=(self._EventID.API_PORT,))
         thread.start()
 
-    def send_message(self, message, server_address='server', server_port=65432):
+    def send_message(self, message, server_address='OMserver', server_port=65432):
         try:
             # Create a socket connection
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
