@@ -285,7 +285,7 @@ class NgrokSignalRedirect:
             log.info(f"Email from {from_address} is not from TradingView, SKIP.")
             return         
 
-        log.info(f"Sending webhook alert<{email_subject}>, content: {email_content}")
+        # log.info(f"Sending webhook alert<{email_subject}>, content: {email_content}")
         try:
             # send_webhook(email_content)
             self.send_message(email_content)
@@ -306,22 +306,22 @@ class NgrokSignalRedirect:
         thread = StoppableThread(target=api_server_start, args=(self._EventID.API_PORT,))
         thread.start()
 
-    def send_message(self, message, server_address='OMserver', server_port=65432):
+    def send_message(self, message, server_address='localhost', server_port=65432):
         try:
             # Create a socket connection
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-                print(f"Connecting to {server_address} on port {server_port}")
+                log.info(f"Connecting to {server_address} on port {server_port}")
                 client_socket.connect((server_address, server_port))  # Connect to the server
 
-                print(f'Sending message: {message}')
+                log.info(f'Sending message to server ...')
                 client_socket.sendall(message.encode())  # Send the message
 
                 # Receive the response
                 data = client_socket.recv(1024)  # Receive up to 1024 bytes
-                print(f"Received response: {data.decode()}")
+                log.ok(f"Received response: {data.decode()}")
 
         except Exception as e:
-            print(f"Failed to send message: {e}")
+            log.error(f"Failed to send message: {e}")
             
     def main(self):
         if not ngrok_auth_token:

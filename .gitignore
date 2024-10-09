@@ -7,3 +7,6 @@ _dev.py
 **/data
 **/src/__pycache__
 *.pyc
+*.ipynb
+*.json
+*.toml

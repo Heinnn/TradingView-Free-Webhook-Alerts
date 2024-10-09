@@ -1,16 +1,18 @@
 # Use an official Python runtime as a parent image
 FROM python:3.10.13-slim-bookworm
 
+WORKDIR /app
+COPY . /app
+
 # Install netcat (nc) for healthcheck
 RUN apt-get update && apt-get install -y \
     netcat-traditional  \
     telnet \
     && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory inside the container
-WORKDIR /app
+    RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-# Copy the server script into the container at /app
 COPY server.py .
 
 # Expose port 65432 for the server
